@@ -1,0 +1,60 @@
+/*去除页面元素多余空白*/
+*, *:after, *:before {
+    margin: 0;
+    padding: 0;
+    overflow-scrolling: touch;
+    -webkit-overflow-scrolling: touch;
+}
+/*指定页面最低高度*/
+html, body, #app {
+    height: 100%;
+}
+/*去除滚动条*/
+*::-webkit-scrollbar, *:after::-webkit-scrollbar, *:before::-webkit-scrollbar, *::-webkit-scrollbar-thumb, *:after::-webkit-scrollbar-thumb, *:before::-webkit-scrollbar-thumb {
+    display: none;
+}
+/*去除输入框、按钮等边框*/
+input, button, textarea, button:focus {
+    border: none;
+}
+/*去除输入框、按钮选中状态下等边框*/
+input:disabled {
+    background: none;
+    border: none;
+}
+/*元素左浮动*/
+.float-left {
+    float: left;
+}
+/*元素右浮动*/
+.float-right {
+    float: right;
+}
+/*清除浮动*/
+.clear-fix {
+    *zoom: 1;
+}
+.clear-fix::after {
+    content: '';
+    height: 0;
+    line-height: 0;
+    visibility: hidden;
+    clear: both;
+    display: block;
+}
+/*单行省略*/
+.line-word-hidden {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.van-loading.van-loading--spinner {
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+}

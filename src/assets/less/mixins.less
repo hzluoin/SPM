@@ -1,0 +1,5 @@
+//定义混入函数
+@viewportWidth: 750;
+.px2vw(@name, @px){
+    @{name}: @px / @viewportWidth * 100vw;
+}

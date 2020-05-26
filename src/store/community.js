@@ -1,0 +1,42 @@
+import Vue from 'vue'
+const state = {
+  community: []
+}
+
+const getters = {
+  getCommunity (state) {
+    return state.community
+  }
+}
+
+const mutations = {
+  setCommunity (state, community) {
+    state.community = community
+  }
+}
+
+const actions = {
+  qryAllCommunity ({ getters, commit }, refresh) {
+    if (getters.getCommunity.length === 0 || refresh) {
+      return new Promise((resolve, reject) => {
+        Vue.$axios.post('/api/communityInfo/infoQueryAll', {}).then(res => {
+          // commit('setCommunity', res.data.rows.map(item => {
+          //   item['text'] = item['communityName']
+          //   return item
+          // }))
+          commit('setCommunity', res.data.rows)
+          resolve()
+        }).catch(err => {
+          reject(err)
+        })
+      })
+    }
+  }
+}
+
+export default {
+  state,
+  getters,
+  actions,
+  mutations
+}
