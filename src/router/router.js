@@ -50,13 +50,21 @@ export default new Router({
       component: () => import('@views/Login.vue')
     },
     {
-      path: '/data_entry',
-      name: 'DataEntry',
+      path: '/batch',
+      name: 'Batch',
       meta: {
         level: 2
         // limit: 'DataEntry'
       },
-      component: () => import('@views/DataEntry.vue')
+      component: () => import('@views/entry/Batch.vue')
+    },
+    {
+      path: '/preview',
+      name: 'Preview',
+      meta: {
+        level: 3
+      },
+      component: () => import('@views/entry/Preview.vue')
     },
     {
       path: '/room_status',

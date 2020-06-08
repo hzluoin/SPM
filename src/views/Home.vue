@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <div class="button" @click="$router.push({ name: 'DataEntry' })">数据采集</div>
+    <div class="button" @click="$router.push({ name: 'Batch' })">数据采集</div>
     <div class="button" @click="$router.push({ name: 'RoomStatus' })">房态图</div>
   </div>
 </template>

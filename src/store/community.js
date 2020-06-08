@@ -31,6 +31,15 @@ const actions = {
         })
       })
     }
+  },
+  updateCommunity ({ getters, commit }, community) {
+    return new Promise((resolve, reject) => {
+      Vue.$axios.post('/api/communityInfo/edit', community).then(res => {
+        resolve()
+      }).catch(err => {
+        reject(err)
+      })
+    })
   }
 }
 

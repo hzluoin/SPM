@@ -10,7 +10,7 @@ const getters = {
     return state.limit.indexOf(limitName) !== -1
   },
   getToken (state) {
-    return state
+    return state.token
   }
 }
 
@@ -38,10 +38,10 @@ const actions = {
         if (res.code === 200) {
           commit('setUser', {
             username: username,
-            token: res.token,
+            token: res.data.token,
             limit: ['DataEntry', 'RoomStatus']
           })
-          localStorage.setItem('token', res.token)
+          localStorage.setItem('token', res.data.token)
           resolve(res)
         } else {
           reject(res.message)

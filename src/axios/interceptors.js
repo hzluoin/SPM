@@ -1,5 +1,9 @@
 import { Toast } from 'vant'
-
+import Vue from 'vue'
+import store from '../store'
+import UTF8 from 'crypto-js/enc-utf8'
+import Base64 from 'crypto-js/enc-base64'
+import md5 from 'js-md5'
 const axios = require('axios')
 axios.defaults.headers.post['Content-Type'] = 'application/json'
 
@@ -8,14 +12,28 @@ axios.interceptors.request.use(function (config) {
   // 在发送请求之前做些什么
   if (config.method === 'post') {
     // 取出参数格式化
-    const params = JSON.stringify(config.data)
-    config.data = {}
-    config.data['token'] = localStorage.getItem('token')
-    config.data['digest'] = 'string'
-    config.data['source'] = 0
-    config.data['timestamp'] = 0
-    config.data['params'] = params
-  } else {
+    const params = JSON.stringify(config.data || {})
+    const timestamp = +new Date()
+    const str = timestamp.toString() + params
+    const md5Str = md5(Vue.getByteArray(str))
+    const digest = Base64.stringify(UTF8.parse(md5Str))
+    const unencrypted = {}
+    unencrypted['token'] = store.getters.getToken
+    unencrypted['digest'] = digest
+    unencrypted['source'] = '3'
+    unencrypted['timestamp'] = timestamp
+    unencrypted['params'] = params
+    // AES加密
+    const key = Vue.Generator.key(16, false)
+    config.k = key
+    const encryptedMsg = Vue.AES.encrypt(JSON.stringify(unencrypted), key)
+    const encryptedKey = Vue.RSA.encrypt(key)
+    config.data = {
+      encParams: encryptedMsg,
+      encKey: encryptedKey
+    }
+    config.headers.isEnc = true
+    config.headers.encKey = encryptedKey
   }
   return config
 }, function (error) {
@@ -25,15 +43,39 @@ axios.interceptors.request.use(function (config) {
 
 // 添加响应拦截器
 axios.interceptors.response.use(function (response) {
-  const res = response.data
+  let res
+  // 区分返回数据的类型
+  const type = Vue.Type(response.data)
+  if (type === 'object') {
+    res = response.data
+  } else if (type === 'string') {
+    const key = response.config.k
+    if (key) {
+      const str = Vue.AES.decrypt(response.data, response.config.k)
+      try {
+        res = JSON.parse(str)
+      } catch (e) {
+        Toast('数据解析发生错误!')
+        return res
+      }
+      console.log(res)
+    } else {
+      res = response.data
+    }
+  }
+
   switch (res.code) {
     case 200:
       return res
     default:
-      Toast(res.message)
+      Toast({
+        title: res.message,
+        message: '',
+        type: 'error'
+      })
+      return res
   }
-  return res
 }, function (error) {
-  Toast('网络异常，请稍后再试！')
+  Toast('与服务器的网络连接发生异常!')
   return Promise.reject(error)
 })
