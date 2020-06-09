@@ -23,6 +23,14 @@ axios.interceptors.request.use(function (config) {
     unencrypted['source'] = '3'
     unencrypted['timestamp'] = timestamp
     unencrypted['params'] = params
+
+    window.console.groupCollapsed('%c 请求包:%c ' + config.url,
+      'background:#909399 ; padding: 1px; border-radius: 3px 0 0 3px;  color: #fff',
+      'background:#41b883 ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff')
+    window.console.log(unencrypted)
+    window.console.log('格式化请求参数:', config.data)
+    window.console.groupEnd()
+
     // AES加密
     const key = Vue.Generator.key(16, false)
     config.k = key
@@ -63,6 +71,12 @@ axios.interceptors.response.use(function (response) {
       res = response.data
     }
   }
+
+  window.console.groupCollapsed('%c 响应包:%c ' + response.config.url,
+    'background:#35495e ; padding: 1px; border-radius: 3px 0 0 3px;  color: #fff',
+    'background:#41b883 ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff')
+  window.console.log(res)
+  window.console.groupEnd()
 
   switch (res.code) {
     case 200:
