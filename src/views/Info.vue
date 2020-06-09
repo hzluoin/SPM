@@ -368,10 +368,8 @@ export default {
         let userAgent = navigator.userAgent
         let isOpera = userAgent.indexOf('Opera') > -1
         if (userAgent.indexOf('Trident') > -1 || userAgent.indexOf('Edge') > -1) {
-          // console.log('Edge')
           this.ieFun(canvas)
         } else if (userAgent.indexOf('compatible') > -1 && userAgent.indexOf('MSIE') > -1 && !isOpera) {
-          // console.log('IE')
           this.ieFun(canvas)
         } else {
           this.otherFun(imgData)

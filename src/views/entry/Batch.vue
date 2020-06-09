@@ -152,7 +152,6 @@ export default {
   },
   methods: {
     onSubmit () {
-      console.log(this.settings())
       this.$store.dispatch('updateCommunity', this.settings()).then()
     },
     // 生成设定

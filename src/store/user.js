@@ -48,7 +48,6 @@ const actions = {
         }
       }).catch(error => {
         reject(error)
-        console.log(error)
       })
     })
   }

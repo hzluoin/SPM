@@ -115,9 +115,7 @@ export default {
           return item
         })
         this.areaPicker = true
-      }).catch(err => {
-        console.log(err)
-      }).finally(() => {
+      }).catch().finally(() => {
         this.loading = false
       })
     },
@@ -131,9 +129,7 @@ export default {
           return item
         }))
         this.ridgepolePicker = true
-      }).catch(err => {
-        console.log(err)
-      }).finally(() => {
+      }).catch().finally(() => {
         this.loading = false
       })
     },
@@ -148,9 +144,7 @@ export default {
           return item.buildings
         }))
         this.ridgepolePicker = true
-      }).catch(err => {
-        console.log(err)
-      }).finally(() => {
+      }).catch().finally(() => {
         this.loading = false
       })
     }

@@ -37,13 +37,15 @@ export default {
     }
   },
   created () {
-    console.log('version:0.0.1')
     // 全局守卫
     this.$router.beforeEach((to, from, next) => {
       this.from = from
       this.to = to
       next()
     })
+  },
+  mounted () {
+    window.console.log('version:0.0.1')
   }
 }
 </script>

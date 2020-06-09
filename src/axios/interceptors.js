@@ -66,7 +66,6 @@ axios.interceptors.response.use(function (response) {
         Toast('数据解析发生错误!')
         return res
       }
-      console.log(res)
     } else {
       res = response.data
     }
