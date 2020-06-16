@@ -74,6 +74,14 @@ export default new Router({
         limit: 'RoomStatus'
       },
       component: () => import('@views/RoomStatus.vue')
+    },
+    {
+      path: '/invite',
+      name: 'Invite',
+      meta: {
+        level: 2
+      },
+      component: () => import('@views/Invite.vue')
     }
   ]
 })

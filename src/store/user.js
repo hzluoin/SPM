@@ -11,6 +11,9 @@ const getters = {
   },
   getToken (state) {
     return state.token
+  },
+  getUsername (state) {
+    return state.username
   }
 }
 

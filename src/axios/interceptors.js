@@ -81,11 +81,7 @@ axios.interceptors.response.use(function (response) {
     case 200:
       return res
     default:
-      Toast({
-        title: res.message,
-        message: '',
-        type: 'error'
-      })
+      Toast(res.message)
       return res
   }
 }, function (error) {
