@@ -76,6 +76,15 @@ export default new Router({
       component: () => import('@views/RoomStatus.vue')
     },
     {
+      path: '/maintain',
+      name: 'Maintain',
+      meta: {
+        level: 2,
+        limit: 'Maintain'
+      },
+      component: () => import('@views/Maintain.vue')
+    },
+    {
       path: '/invite',
       name: 'Invite',
       meta: {

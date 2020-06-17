@@ -42,7 +42,7 @@ const actions = {
           commit('setUser', {
             username: username,
             token: res.data.token,
-            limit: ['DataEntry', 'RoomStatus']
+            limit: ['DataEntry', 'RoomStatus', 'Maintain']
           })
           localStorage.setItem('token', res.data.token)
           resolve(res)

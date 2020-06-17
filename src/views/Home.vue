@@ -1,7 +1,8 @@
 <template>
   <div class="home">
-    <div class="button" @click="$router.push({ name: 'Batch' })">数据采集</div>
-    <div class="button" @click="$router.push({ name: 'RoomStatus' })">房态图</div>
+    <div class="button" @click="$router.push({ name: 'RoomStatus' })">疫情房态图</div>
+    <div class="button" @click="$router.push({ name: 'Batch' })">楼栋数据采集</div>
+    <div class="button" @click="$router.push({ name: 'Maintain' })">楼栋数据维护</div>
   </div>
 </template>
 

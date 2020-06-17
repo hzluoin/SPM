@@ -79,8 +79,8 @@
         <van-field v-model="endRoom" label="结束室" input-align="right" placeholder="请输入结束房屋"/>
       </van-cell-group>
 
-      <van-button type="info" size="normal" block>下一步</van-button>
-      <van-button type="info" size="normal" block native-type="submit" plain>跳过预览直接创建</van-button>
+      <van-button type="info" size="normal" block>创建</van-button>
+      <!--<van-button type="info" size="normal" block native-type="submit" plain>跳过预览直接创建</van-button>-->
       <div></div>
     </van-form>
   </div>
