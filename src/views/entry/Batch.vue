@@ -1,12 +1,9 @@
 <template>
   <div class="batch">
     <van-nav-bar title="楼栋信息批量采集设定" left-arrow @click-left="$router.go(-1)"/>
+    <van-cell icon="location" title="地区" class="location" :value="area"  @click="areaPicker=true"/>
     <van-form @submit="onSubmit">
       <van-field readonly clickable name="picker" :value="community.communityName" label="小区名称" placeholder="点击选择小区" @click="showCommunityPicker = true" input-align="right"/>
-      <van-popup v-model="showCommunityPicker" position="bottom">
-        <van-picker show-toolbar :columns="communityList" value-key="communityName" @confirm="onCommunityConfirm" @cancel="showCommunityPicker = false"/>
-      </van-popup>
-
       <!--区域-->
       <van-cell-group title="区域" class="area">
         <van-field name="switch" label="小区是否分区" input-align="right">
@@ -15,7 +12,7 @@
           </template>
         </van-field>
         <template v-if="hasArea">
-          <van-field name="ridgepoleType" label="区域名称" input-align="right" v-for="(item, index) in areaList" :key="index">
+          <van-field name="ridgepoleType" label="区域名称" input-align="right" v-for="(item, index) in zoneList" :key="index">
             <template #input>
               <input :ref="'area' + index"/><van-icon name="clear" size="20" color="#ee0a24"/>
             </template>
@@ -83,22 +80,37 @@
       <!--<van-button type="info" size="normal" block native-type="submit" plain>跳过预览直接创建</van-button>-->
       <div></div>
     </van-form>
+    <!--地区选择-->
+    <van-popup v-model="areaPicker" position="bottom">
+      <van-area :area-list="areaList" @confirm="onConfirmArea" @cancel="areaPicker=false" value="430104"/>
+    </van-popup>
+    <!--社区选择-->
+    <van-popup v-model="showCommunityPicker" position="bottom">
+      <van-picker show-toolbar :columns="communityData" value-key="communityName" @confirm="onCommunityConfirm" @cancel="showCommunityPicker = false"/>
+    </van-popup>
   </div>
 </template>
 
 <script>
 import PickerData from '@data/PickerData'
+import area from '../../assets/data/area'
 export default {
   name: 'Batch',
   data () {
     return {
       loading: false,
+      // 省市区
+      area: '湖南省/娄底市/娄星区',
+      areaPicker: false,
+      areaList: area,
+      areaCode: ['43', '13', '02'],
       // 小区
+      communitySourceData: {},
       community: {},
       showCommunityPicker: false,
       activeCommunity: ['1'],
       // 区域
-      areaList: [''],
+      zoneList: [''],
       hasArea: false,
       // 楼栋数据
       ridgepoleType: '1',
@@ -121,8 +133,8 @@ export default {
     }
   },
   computed: {
-    communityList () {
-      return this.$store.getters.getCommunity
+    communityData () {
+      return this.communitySourceData[this.areaCode.join('')]
     },
     ridgepolePickerData () {
       switch (this.ridgepoleType) {
@@ -148,11 +160,39 @@ export default {
     }
   },
   created () {
-    this.$store.dispatch('qryAllCommunity').then()
+    this.qryCommunity(this.areaCode)
   },
   methods: {
     onSubmit () {
       this.$store.dispatch('updateCommunity', this.settings()).then()
+    },
+    // 省市区选择
+    onConfirmArea (area) {
+      this.areaPicker = false
+      const code = area[2]['code']
+      this.areaCode = [code.slice(0, 2), code.slice(2, 4), code.slice(4, 6)]
+      this.area = area.map(item => {
+        return item.name
+      }).join('/')
+      this.qryCommunity(this.areaCode)
+    },
+    // 查询社区
+    qryCommunity (areaCode) {
+      if (!this.communityData) {
+        this.loading = true
+        this.$axios.post('/api/communityInfo/infoQueryAll', {
+          lProvinceCode: areaCode[0],
+          lCityCode: areaCode[0] + areaCode[1],
+          lDistrictCode: areaCode.join('')
+        }).then(res => {
+          this.$set(this.communitySourceData, areaCode.join(''), res.data.rows.map(item => {
+            item['text'] = item['communityName']
+            return item
+          }))
+        }).catch().finally(() => {
+          this.loading = false
+        })
+      }
     },
     // 生成设定
     settings () {
@@ -163,7 +203,7 @@ export default {
       // 楼栋列表
       const buildingEntityList = [{ 'buildingCode': '一栋', buildingUnitEntityList }]
       // 区域列表
-      const zoneEntityList = this.areaList.map((item, index) => {
+      const zoneEntityList = this.zoneList.map((item, index) => {
         const zoneName = this.$refs['area' + index][0].value
         return {
           communityId: this.community.id,
@@ -188,7 +228,7 @@ export default {
         latitude: this.community.latitude || '', // 纬度
         phaseTotal: this.community.phaseTotal || '', // 期数
         isZone: this.hasArea ? 1 : 0, // 是否分区（数据字典：0-否；1-是）
-        zoneTotal: this.areaList.length, // 区域总数
+        zoneTotal: this.zoneList.length, // 区域总数
         buildingTotal: this.ridgepoleNumber, // 楼栋总数
         unitTotal: this.unitNumber, // 单元总数
         houseTotal: this.roomNumber, // 房屋总套数
@@ -201,7 +241,7 @@ export default {
     },
     // 增加区域
     addArea () {
-      this.areaList.push('')
+      this.zoneList.push('')
     },
     onStartConfirm (value) {
       this.startRidgepole = value
@@ -221,6 +261,9 @@ export default {
 
 <style lang="less" scoped>
   .batch {
+    .location {
+      color: #07c160;
+    }
     .area {
       input {
         text-align: right;

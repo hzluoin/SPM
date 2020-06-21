@@ -16,21 +16,19 @@ const mutations = {
 }
 
 const actions = {
-  qryAllCommunity ({ getters, commit }, refresh) {
-    if (getters.getCommunity.length === 0 || refresh) {
-      return new Promise((resolve, reject) => {
-        Vue.$axios.post('/api/communityInfo/infoQueryAll', {}).then(res => {
-          // commit('setCommunity', res.data.rows.map(item => {
-          //   item['text'] = item['communityName']
-          //   return item
-          // }))
-          commit('setCommunity', res.data.rows)
-          resolve()
-        }).catch(err => {
-          reject(err)
-        })
+  qryAllCommunity ({ getters, commit }) {
+    return new Promise((resolve, reject) => {
+      Vue.$axios.post('/api/communityInfo/infoQueryAll', {}).then(res => {
+        // commit('setCommunity', res.data.rows.map(item => {
+        //   item['text'] = item['communityName']
+        //   return item
+        // }))
+        commit('setCommunity', res.data.rows)
+        resolve()
+      }).catch(err => {
+        reject(err)
       })
-    }
+    })
   },
   updateCommunity ({ getters, commit }, community) {
     return new Promise((resolve, reject) => {

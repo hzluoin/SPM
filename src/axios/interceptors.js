@@ -6,6 +6,7 @@ import Base64 from 'crypto-js/enc-base64'
 import md5 from 'js-md5'
 const axios = require('axios')
 axios.defaults.headers.post['Content-Type'] = 'application/json'
+axios.defaults.timeout = 10000
 
 // 添加请求拦截器
 axios.interceptors.request.use(function (config) {
@@ -79,10 +80,10 @@ axios.interceptors.response.use(function (response) {
 
   switch (res.code) {
     case 200:
-      return res
+      return Promise.resolve(res)
     default:
       Toast(res.message)
-      return res
+      return Promise.reject(res)
   }
 }, function (error) {
   Toast('与服务器的网络连接发生异常!')
