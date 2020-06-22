@@ -1,6 +1,6 @@
 <template>
   <div class="batch">
-    <van-nav-bar title="楼栋信息批量采集设定" left-arrow @click-left="$router.go(-1)"/>
+    <van-nav-bar title="楼栋信息批量采集" left-arrow @click-left="$router.go(-1)"/>
     <van-cell icon="location" title="地区" class="location" :value="area"  @click="areaPicker=true"/>
     <van-form @submit="onSubmit">
       <van-field readonly clickable name="picker" :value="community.communityName" label="小区名称" placeholder="点击选择小区" @click="showCommunityPicker = true" input-align="right"/>
@@ -14,11 +14,11 @@
         <template v-if="hasArea">
           <van-field name="ridgepoleType" label="区域名称" input-align="right" v-for="(item, index) in zoneList" :key="index">
             <template #input>
-              <input :ref="'area' + index"/><van-icon name="clear" size="20" color="#ee0a24"/>
+              <input :ref="'area' + index" v-model="zoneList[index]" placeholder="请输入区域名称"/><van-icon name="clear" size="20" color="#ee0a24" @click="removeArea(index)" v-if="index!==0"/>
             </template>
           </van-field>
           <van-row>
-            <van-col span="24" type="flex" align="center" @click="addArea"><van-icon name="add" size="24" color="#1989fa" /></van-col>
+            <van-col span="24" type="flex" align="center" @click="addArea"><van-icon name="add" size="24" color="#1989fa"/></van-col>
           </van-row>
         </template>
       </van-cell-group>
@@ -36,7 +36,14 @@
           </template>
         </van-field>
         <van-field label="示例" input-align="right" :placeholder="ridgepolePickerData[0]" disabled/>
-        <van-field v-model="ridgepoleNumber" label="栋数" input-align="right" placeholder="请输入楼栋数量"/>
+        <van-field v-model="ridgepoleNumber" label="栋数" input-align="right" placeholder="请输入楼栋数量" v-show="ridgepoleType!=='4'"/>
+        <van-field v-model="ridgepoleNumber" label="栋数" input-align="right" v-show="ridgepoleType==='4'">
+          <template #input>
+            <van-checkbox-group v-model="ridgepoleList" direction="horizontal">
+              <van-checkbox :name="item" v-for="(item, index) in ridgepolePickerData" :key="index">{{item}}</van-checkbox>
+            </van-checkbox-group>
+          </template>
+        </van-field>
       </van-cell-group>
 
       <!--单元-->
@@ -98,6 +105,7 @@ export default {
       // 楼栋数据
       ridgepoleType: '1', // 楼栋编号类型
       ridgepoleNumber: '', // 楼栋数量
+      ridgepoleList: [],
       // 单元数据
       unitType: '1',
       unitNumber: '',
@@ -217,6 +225,10 @@ export default {
     // 增加区域
     addArea () {
       this.zoneList.push('')
+    },
+    // 删除区域
+    removeArea (index) {
+      this.zoneList.splice(index, 1)
     },
     onCommunityConfirm (val) {
       this.showCommunityPicker = false
