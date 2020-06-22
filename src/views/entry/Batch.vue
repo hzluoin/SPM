@@ -30,20 +30,13 @@
             <van-radio-group v-model="ridgepoleType" direction="horizontal">
               <van-radio name="1">大写</van-radio>
               <van-radio name="2">小写</van-radio>
-              <van-radio name="3">方位</van-radio>
+              <van-radio name="3">字母</van-radio>
+              <van-radio name="4">方位</van-radio>
             </van-radio-group>
           </template>
         </van-field>
-        <van-field readonly clickable name="picker" input-align="right" label="起始栋" placeholder="点击选择"
-                   :value="startRidgepole" @click="ridgepoleStartPicker = true"/>
-        <van-field readonly clickable name="picker" input-align="right" label="结束栋" placeholder="点击选择"
-                   :value="endRidgepole" @click="ridgepoleEndPicker = true"/>
-        <van-popup v-model="ridgepoleStartPicker" position="bottom">
-          <van-picker show-toolbar :columns="ridgepolePickerData" @confirm="onStartConfirm" @cancel="ridgepoleStartPicker = false"/>
-        </van-popup>
-        <van-popup v-model="ridgepoleEndPicker" position="bottom">
-          <van-picker show-toolbar :columns="ridgepolePickerData" @confirm="onEndConfirm" @cancel="ridgepoleEndPicker = false"/>
-        </van-popup>
+        <van-field label="示例" input-align="right" :placeholder="ridgepolePickerData[0]" disabled/>
+        <van-field v-model="ridgepoleNumber" label="栋数" input-align="right" placeholder="请输入楼栋数量"/>
       </van-cell-group>
 
       <!--单元-->
@@ -56,24 +49,14 @@
             </van-radio-group>
           </template>
         </van-field>
-        <van-field readonly clickable name="picker" input-align="right" label="起始单元" placeholder="点击选择"
-                   :value="startUnit" @click="unitStartPicker = true"/>
-        <van-field readonly clickable name="picker" input-align="right" label="结束单元" placeholder="点击选择"
-                   :value="endRidgepole" @click="unitEndPicker = true"/>
-        <van-popup v-model="unitStartPicker" position="bottom">
-          <van-picker show-toolbar :columns="unitPickerData" @confirm="onStartConfirm" @cancel="unitStartPicker = false"/>
-        </van-popup>
-        <van-popup v-model="unitEndPicker" position="bottom">
-          <van-picker show-toolbar :columns="unitPickerData" @confirm="onEndConfirm" @cancel="unitEndPicker = false"/>
-        </van-popup>
+        <van-field label="示例" input-align="right" :placeholder="unitPickerData[0]" disabled/>
+        <van-field v-model="unitNumber" label="栋数" input-align="right" placeholder="请输入单元数量"/>
       </van-cell-group>
 
-      <!--室-->
-      <van-cell-group title="房室">
-        <van-field name="switch" label="批量创建室" input-align="right"></van-field>
-        <!--批量创建室-->
-        <van-field v-model="startRoom" label="起始室" input-align="right" placeholder="请输入起始房屋"/>
-        <van-field v-model="endRoom" label="结束室" input-align="right" placeholder="请输入结束房屋"/>
+      <!--房间-->
+      <van-cell-group title="房间">
+        <van-field v-model="roomNumber" label="房间数/每层" input-align="right" placeholder="请输入每层房间数量"/>
+        <van-field v-model="roomNumber" label="" input-align="right" placeholder="请输入每层房间数量"/>
       </van-cell-group>
 
       <van-button type="info" size="normal" block>创建</van-button>
@@ -113,23 +96,13 @@ export default {
       zoneList: [''],
       hasArea: false,
       // 楼栋数据
-      ridgepoleType: '1',
-      ridgepoleStartPicker: false,
-      ridgepoleEndPicker: false,
-      startRidgepole: '',
-      endRidgepole: '',
-      ridgepoleNumber: 0,
+      ridgepoleType: '1', // 楼栋编号类型
+      ridgepoleNumber: '', // 楼栋数量
       // 单元数据
       unitType: '1',
-      unitStartPicker: false,
-      unitEndPicker: false,
-      startUnit: '',
-      endUnit: '',
-      unitNumber: 0,
+      unitNumber: '',
       // 房号数据
-      startRoom: '',
-      endRoom: '',
-      roomNumber: 0
+      roomNumber: ''
     }
   },
   computed: {
@@ -144,6 +117,8 @@ export default {
           return PickerData['ridgepole2']
         case '3':
           return PickerData['ridgepole3']
+        case '4':
+          return PickerData['ridgepole4']
         default:
           return PickerData['ridgepole1']
       }
@@ -242,14 +217,6 @@ export default {
     // 增加区域
     addArea () {
       this.zoneList.push('')
-    },
-    onStartConfirm (value) {
-      this.startRidgepole = value
-      this.ridgepoleStartPicker = false
-    },
-    onEndConfirm (value) {
-      this.endRidgepole = value
-      this.ridgepoleEndPicker = false
     },
     onCommunityConfirm (val) {
       this.showCommunityPicker = false
