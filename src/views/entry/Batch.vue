@@ -57,13 +57,22 @@
           </template>
         </van-field>
         <van-field label="示例" input-align="right" :placeholder="unitPickerData[0]" disabled/>
-        <van-field v-model="unitNumber" label="栋数" input-align="right" placeholder="请输入单元数量"/>
+        <van-field v-model="unitNumber" label="单元数" input-align="right" placeholder="请输入单元数量"/>
       </van-cell-group>
 
       <!--房间-->
       <van-cell-group title="房间">
         <van-field v-model="roomNumber" label="房间数/每层" input-align="right" placeholder="请输入每层房间数量"/>
         <van-field v-model="roomNumber" label="" input-align="right" placeholder="请输入每层房间数量"/>
+        <van-field v-model="ridgepoleNumber" label="规则顺序" input-align="right">
+          <template #input>
+            <van-checkbox-group v-model="ruleList" direction="horizontal">
+              <van-checkbox name="楼栋规则">{{item}}</van-checkbox>
+              <van-checkbox name="单元规则">{{item}}</van-checkbox>
+              <van-checkbox name="楼层规则">{{item}}</van-checkbox>
+            </van-checkbox-group>
+          </template>
+        </van-field>
       </van-cell-group>
 
       <van-button type="info" size="normal" block>创建</van-button>
@@ -77,6 +86,10 @@
     <!--社区选择-->
     <van-popup v-model="showCommunityPicker" position="bottom">
       <van-picker show-toolbar :columns="communityData" value-key="communityName" @confirm="onCommunityConfirm" @cancel="showCommunityPicker = false"/>
+    </van-popup>
+    <!--规则顺序选择-->
+    <van-popup v-model="showPicker" position="bottom">
+      <van-picker show-toolbar :columns="index" @confirm="onIndexConfirm" @cancel="showPicker = false"/>
     </van-popup>
   </div>
 </template>
@@ -105,15 +118,37 @@ export default {
       // 楼栋数据
       ridgepoleType: '1', // 楼栋编号类型
       ridgepoleNumber: '', // 楼栋数量
-      ridgepoleList: [],
+      ridgepoleList: [], // 楼栋为方位时，楼栋编号
       // 单元数据
       unitType: '1',
       unitNumber: '',
-      // 房号数据
-      roomNumber: ''
+      // 房号数据: 楼栋规则 + 单元规则 + 楼层规则 + 房号规则(必须)
+      roomNumber: '', // 每层房间数
+      hasRidgepole: false, // 是否包含楼栋规则
+      indexRidgepole: 1, // 楼栋规则位置
+      hasUnit: false, // 是否包含单元规则
+      indexUnit: 2, // 楼栋规则位置
+      hasFloor: false, // 是否包含楼层规则
+      indexFloor: 3, // 楼栋规则位置
+      indexRoom: 4, // 楼栋规则位置
+      showPicker: false,
+      rule: ''
     }
   },
   computed: {
+    index () {
+      return [
+        { text: 1, disabled: false },
+        { text: 2, disabled: false },
+        { text: 3, disabled: false },
+        { text: 4, disabled: false }
+      ].map(item => {
+        if ([this.indexRidgepole, this.indexUnit, this.indexFloor].indexOf(item.text) !== -1) {
+          item.disabled = true
+        }
+        return item
+      })
+    },
     communityData () {
       return this.communitySourceData[this.areaCode.join('')]
     },
@@ -230,9 +265,18 @@ export default {
     removeArea (index) {
       this.zoneList.splice(index, 1)
     },
+    // 社区选择
     onCommunityConfirm (val) {
       this.showCommunityPicker = false
       this.community = val
+    },
+    // 规则位置选择
+    onIndexConfirm (val) {
+      switch (this.rule) {
+        case 'Ridgepole':
+          this.indexRidgepole = val.text
+          break
+      }
     }
   }
 }

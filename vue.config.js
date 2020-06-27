@@ -18,6 +18,13 @@ module.exports = {
   },
   devServer: {
     proxy: {
+      '/api_face/*': {
+        target: 'https://api-cn.faceplusplus.com', // Face++
+        changeOrigin: true,
+        pathRewrite: {
+          '^/api_face': ''
+        }
+      },
       '/api/*': {
         target: 'http://47.75.112.198:8099', // 测试环境
         // target: 'http://cyg.easy.echosite.cn', // 艺高

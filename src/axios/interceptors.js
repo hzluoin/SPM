@@ -10,6 +10,10 @@ axios.defaults.timeout = 10000
 
 // 添加请求拦截器
 axios.interceptors.request.use(function (config) {
+  if (/^\/api_face\//.test(config.url)) {
+    config.headers.post['Content-Type'] = 'multipart/form-data'
+    return config
+  }
   // 在发送请求之前做些什么
   if (config.method === 'post') {
     // 取出参数格式化
@@ -52,11 +56,28 @@ axios.interceptors.request.use(function (config) {
 
 // 添加响应拦截器
 axios.interceptors.response.use(function (response) {
+  if (/^\/api_face\//.test(response.config.url)) {
+    switch (response.status) {
+      case 200:
+        return Promise.resolve(response.data)
+      default:
+        Toast(response.statusText)
+        return Promise.reject(response.status)
+    }
+    return
+  }
   let res
   // 区分返回数据的类型
   const type = Vue.Type(response.data)
   if (type === 'object') {
     res = response.data
+    switch (res.code) {
+      case 200:
+        return Promise.resolve(res)
+      default:
+        Toast(res.message)
+        return Promise.reject(res)
+    }
   } else if (type === 'string') {
     const key = response.config.k
     if (key) {

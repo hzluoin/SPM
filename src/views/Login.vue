@@ -1,6 +1,8 @@
 <template>
   <div class="login">
-    <div class="logo">LOGO</div>
+    <div class="logo">
+      <img src="@img/logo.png"/>
+    </div>
     <van-field class="username" v-model="username" input-align="left" clearable placeholder="请输入管理账号"/>
     <van-field class="password" v-model="password" input-align="left" clearable placeholder="请输入密码" type="password"/>
     <van-button class="submit" type="info" size="large" @click="onSubmit">登录</van-button>
@@ -42,6 +44,7 @@ export default {
   .login {
     .logo {
       .px2vw(margin-top, 200);
+      .px2vw(margin-bottom, 100);
       text-align: center;
     }
     .username, .password, .submit {
@@ -51,6 +54,8 @@ export default {
     }
     .submit {
       display: block;
+      background-color: #00beae;
+      border: 1px solid #15dfcd;
     }
   }
 </style>

@@ -1,77 +1,119 @@
 <template>
-  <van-form @submit="onSubmit">
-    <van-field
-      v-model="name"
-      name="姓名"
-      label="姓名"
-      placeholder="请输入姓名"
-      :rules="[{ required: true, message: '请输入姓名' }]"/>
-    <van-field
-      v-model="idCard"
-      name="身份证"
-      label="身份证"
-      placeholder="请输入身份证"
-      :rules="[{ required: true, message: '请输入身份证' }]"/>
+  <div class="invite">
+    <van-nav-bar title="门禁认证"/>
+    <van-form @submit="onSubmit">
+      <van-field
+        v-model="inviteCode"
+        name="inviteCode"
+        label="邀请码"
+        placeholder="请输入邀请码"
+        :rules="[{ required: true, message: '请输入邀请码' }]"/>
 
-    <van-field name="uploader" label="个人头像">
-      <template #input>
-        <van-uploader v-model="fileList" :after-read="afterRead"/>
-      </template>
-    </van-field>
+      <van-field label="个人照片(最大2M)">
+        <template #input>
+          <van-uploader v-model="self" :after-read="getSelf" :max-count="1" :max-size="2 * 1024 * 1024" accept="image/jpeg"/>
+        </template>
+      </van-field>
 
-    <van-field name="uploader" label="身份证正面照">
-      <template #input>
-        <van-uploader v-model="fileList" :after-read="afterRead"/>
-      </template>
-    </van-field>
+      <van-field label="身份证正面照(最大2M)">
+        <template #input>
+          <van-uploader v-model="front" :after-read="ocr" :max-count="1" :max-size="2 * 1024 * 1024" accept="image/jpeg"/>
+        </template>
+      </van-field>
 
-    <van-field name="uploader" label="身份证反面照">
-      <template #input>
-        <van-uploader v-model="fileList" :after-read="afterRead"/>
-      </template>
-    </van-field>
+      <van-field label="身份证反面照(最大2M)">
+        <template #input>
+          <van-uploader v-model="back" :after-read="ocr" :max-count="1" :max-size="2 * 1024 * 1024" accept="image/jpeg"/>
+        </template>
+      </van-field>
 
-    <div style="margin: 16px;">
-      <van-button round block type="info" native-type="submit">
-        提交
-      </van-button>
-    </div>
-  </van-form>
+      <div style="margin: 16px;">
+        <van-button round block type="info" native-type="submit">提交</van-button>
+      </div>
+    </van-form>
+  </div>
 </template>
 
-<script type="text/javascript" src="facepp_sdk/jquery.min.js"></script>
-<script type="text/javascript" src="facepp_sdk/exif.js"></script>
-<script type="text/javascript" src="facepp_sdk/facepp_sdk.js"></script>
 <script>
 export default {
   // 组件名称
   name: 'Invite',
   data () {
     return {
-      name: '',
+      loading: false,
+      inviteCode: '',
       idCard: '',
-      fileList: [
-        // {
-        //   url: 'https://img.yzcdn.cn/vant/leaf.jpg',
-        //   status: 'uploading',
-        //   message: '上传中...'
-        // }
-      ]
+      self: [], // 自拍照
+      front: [], // 正面照
+      back: [], // 反面照
+      frontData: {
+        'gender': '女',
+        'name': '牛XX',
+        'id_card_number': 'XXXXXX19841013XXXX',
+        'birthday': '1984-10-13',
+        'race': '汉',
+        'address': '广东省深圳市XXXXXXXX',
+        'legality': {
+          'Edited': 0.001,
+          'Photocopy': 0,
+          'ID Photo': 0.502,
+          'Screen': 0.496,
+          'Temporary ID Photo': 0
+        },
+        'type': 1,
+        'side': 'front'
+      }, // 正面照数据
+      backData: {
+        'issued_by': '北京市公安局海淀分局',
+        'side': 'back',
+        'valid_date': '2010.11.13-2020.11.13'
+      } // 正面照数据
     }
   },
   mounted () {
-    document.title = '好友邀请'
+    document.title = '门禁邀请'
   },
   methods: {
-    onSubmit () {},
-    afterRead (file) {
+    onSubmit () {
+      this.$axios.post('/api/accessCtl/auth', {
+        name: this.frontData['name'],
+        sex: /男/.test(this.frontData['gender']) ? 1 : 2,
+        cardType: 0,
+        idCard: this.frontData['id_card_number'],
+        inviteCode: '123456',
+        fileList: this.self,
+        attachExt: ''
+      }).then(res => {
+      }).catch().finally(() => {
+        this.loading = false
+      })
+    },
+    // 个人照
+    getSelf (file) {
+
+    },
+    // 证件识别
+    ocr (file) {
       file.status = 'uploading'
       file.message = '上传中...'
-
-      setTimeout(() => {
+      const formData = new FormData()
+      formData.append('api_key', 'beJJKb5wweqO1YGJ6GGojINItqPY5Q4i')
+      formData.append('api_secret', 'XJTByZaTni891ztRBCC_qY_N-iRRyEa9')
+      formData.append('image_base64', file.content)
+      this.$axios.post('/api_face/cardpp/v1/ocridcard', formData).then(res => {
+        res.cards.forEach(item => {
+          if (item.side === 'front') {
+            this.frontData = item
+          } else {
+            this.backData = item
+          }
+        })
+      }).catch(() => {
         file.status = 'failed'
         file.message = '上传失败'
-      }, 1000)
+      }).finally(() => {
+        this.loading = false
+      })
     }
   }
 }
