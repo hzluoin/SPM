@@ -10,7 +10,7 @@ axios.defaults.timeout = 10000
 
 // 添加请求拦截器
 axios.interceptors.request.use(function (config) {
-  if (/^\/api_face\//.test(config.url)) {
+  if (/^\/(api_face|api_upload)\//.test(config.url)) {
     config.headers.post['Content-Type'] = 'multipart/form-data'
     return config
   }
@@ -56,7 +56,7 @@ axios.interceptors.request.use(function (config) {
 
 // 添加响应拦截器
 axios.interceptors.response.use(function (response) {
-  if (/^\/api_face\//.test(response.config.url)) {
+  if (/^\/(api_face|api_upload)\//.test(response.config.url)) {
     switch (response.status) {
       case 200:
         return Promise.resolve(response.data)
@@ -64,7 +64,6 @@ axios.interceptors.response.use(function (response) {
         Toast(response.statusText)
         return Promise.reject(response.status)
     }
-    return
   }
   let res
   // 区分返回数据的类型

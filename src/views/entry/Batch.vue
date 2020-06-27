@@ -63,13 +63,12 @@
       <!--房间-->
       <van-cell-group title="房间">
         <van-field v-model="roomNumber" label="房间数/每层" input-align="right" placeholder="请输入每层房间数量"/>
-        <van-field v-model="roomNumber" label="" input-align="right" placeholder="请输入每层房间数量"/>
         <van-field v-model="ridgepoleNumber" label="规则顺序" input-align="right">
           <template #input>
             <van-checkbox-group v-model="ruleList" direction="horizontal">
-              <van-checkbox name="楼栋规则">{{item}}</van-checkbox>
-              <van-checkbox name="单元规则">{{item}}</van-checkbox>
-              <van-checkbox name="楼层规则">{{item}}</van-checkbox>
+              <van-checkbox name="楼栋规则">楼栋规则</van-checkbox>
+              <van-checkbox name="单元规则">单元规则</van-checkbox>
+              <van-checkbox name="楼层规则">楼层规则</van-checkbox>
             </van-checkbox-group>
           </template>
         </van-field>
@@ -132,7 +131,7 @@ export default {
       indexFloor: 3, // 楼栋规则位置
       indexRoom: 4, // 楼栋规则位置
       showPicker: false,
-      rule: ''
+      ruleList: []
     }
   },
   computed: {

@@ -25,11 +25,25 @@ module.exports = {
           '^/api_face': ''
         }
       },
+      '/api_upload/*': {
+        // target: 'http://47.75.112.198:8099', // 测试环境
+        target: 'http://cyg.easy.echosite.cn', // 艺高
+        changeOrigin: true,
+        pathRewrite: {
+          '^/api_upload': '/h5/'
+        }
+      },
+      '/api_not_login/*': {
+        // target: 'http://47.75.112.198:8099', // 测试环境
+        target: 'http://cyg.easy.echosite.cn', // 艺高
+        changeOrigin: true,
+        pathRewrite: {
+          '^/api_not_login': '/h5/'
+        }
+      },
       '/api/*': {
-        target: 'http://47.75.112.198:8099', // 测试环境
-        // target: 'http://cyg.easy.echosite.cn', // 艺高
-        // target: 'http://192.168.0.113:8099', // 陈明
-        // target: 'http://192.168.0.113:8902', // 刘鹏博
+        // target: 'http://47.75.112.198:8099', // 测试环境
+        target: 'http://cyg.easy.echosite.cn', // 艺高
         changeOrigin: true,
         pathRewrite: {
           '^/api': '/external/h5/'

@@ -9,13 +9,13 @@
         placeholder="请输入邀请码"
         :rules="[{ required: true, message: '请输入邀请码' }]"/>
 
-      <van-field label="个人照片(最大2M)">
+      <van-field label="个人照片(最大2M)" :rules="[{ required: true, message: '请上传个人照' }]">
         <template #input>
-          <van-uploader v-model="self" :after-read="getSelf" :max-count="1" :max-size="2 * 1024 * 1024" accept="image/jpeg"/>
+          <van-uploader v-model="self" :after-read="handleSelf" :max-count="1" :max-size="2 * 1024 * 1024" accept="image/jpeg"/>
         </template>
       </van-field>
 
-      <van-field label="身份证正面照(最大2M)">
+      <van-field label="身份证正面照(最大2M)" :rules="[{ required: true, message: '请上传身份证正面照' }]">
         <template #input>
           <van-uploader v-model="front" :after-read="ocr" :max-count="1" :max-size="2 * 1024 * 1024" accept="image/jpeg"/>
         </template>
@@ -43,7 +43,9 @@ export default {
       loading: false,
       inviteCode: '',
       idCard: '',
+      extension: '',
       self: [], // 自拍照
+      selfUrl: '', // 自拍照上传url
       front: [], // 正面照
       back: [], // 反面照
       frontData: {
@@ -75,22 +77,48 @@ export default {
   },
   methods: {
     onSubmit () {
-      this.$axios.post('/api/accessCtl/auth', {
+      this.$axios.post('/api_not_login/accessCtl/auth', {
         name: this.frontData['name'],
         sex: /男/.test(this.frontData['gender']) ? 1 : 2,
         cardType: 0,
         idCard: this.frontData['id_card_number'],
-        inviteCode: '123456',
-        fileList: this.self,
-        attachExt: ''
+        inviteCode: this.inviteCode,
+        fileList: [{
+          attachExt: this.extension,
+          attachPath: this.selfUrl,
+          attachType: 3
+        }]
       }).then(res => {
       }).catch().finally(() => {
         this.loading = false
       })
     },
-    // 个人照
-    getSelf (file) {
-
+    // 获取自拍照的文件后缀
+    handleSelf (file) {
+      const matcher = /\..*$/.exec(file.file.name)
+      if (matcher.length > 0) {
+        this.extension = matcher[0].replace('.', '')
+      }
+      this.upload(file).then(res => {
+        this.selfUrl = res
+      })
+    },
+    // 文件上传
+    upload (file) {
+      return new Promise((resolve, reject) => {
+        file.status = 'uploading'
+        file.message = '上传中...'
+        const formData = new FormData()
+        formData.append('file', file.file)
+        this.$axios.post('/api_upload/attach/uploadImage', formData).then(res => {
+          file.status = 'success'
+          resolve(res.data)
+        }).catch(res => {
+          file.status = 'failed'
+          file.message = '上传失败'
+          reject(res)
+        })
+      })
     },
     // 证件识别
     ocr (file) {
@@ -101,6 +129,7 @@ export default {
       formData.append('api_secret', 'XJTByZaTni891ztRBCC_qY_N-iRRyEa9')
       formData.append('image_base64', file.content)
       this.$axios.post('/api_face/cardpp/v1/ocridcard', formData).then(res => {
+        file.status = 'success'
         res.cards.forEach(item => {
           if (item.side === 'front') {
             this.frontData = item
@@ -111,8 +140,7 @@ export default {
       }).catch(() => {
         file.status = 'failed'
         file.message = '上传失败'
-      }).finally(() => {
-        this.loading = false
+        this.$toast('证件识别失败!')
       })
     }
   }
