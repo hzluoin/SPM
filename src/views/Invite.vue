@@ -1,7 +1,7 @@
 <template>
   <div class="invite">
     <van-nav-bar title="门禁认证"/>
-    <van-form @submit="onSubmit">
+    <van-form @submit="onSubmit" v-show="!result">
       <van-field
         v-model="inviteCode"
         name="inviteCode"
@@ -31,6 +31,10 @@
         <van-button round block type="info" native-type="submit">提交</van-button>
       </div>
     </van-form>
+    <div v-show="result" class="result">
+      <van-icon name="smile-comment" :class="{success: resultType, error: !resultType}"/>
+      <p>{{resultMsg}}</p>
+    </div>
   </div>
 </template>
 
@@ -40,10 +44,12 @@ export default {
   name: 'Invite',
   data () {
     return {
-      loading: false,
-      inviteCode: '',
-      idCard: '',
-      extension: '',
+      result: false, // 结果模块
+      resultType: true, // 结果类型：成功、失败
+      resultMsg: '', // 结果提示
+      inviteCode: '', // 邀请码
+      idCard: '', // 身份证号码
+      extension: '', // 照片文件扩展名
       self: [], // 自拍照
       selfUrl: '', // 自拍照上传url
       front: [], // 正面照
@@ -74,6 +80,23 @@ export default {
   },
   mounted () {
     document.title = '门禁邀请'
+    // 判断时间是否有效
+    // 判断是否有邀请码
+    const start = +new Date(this.$route.query.startTime)
+    const end = +new Date(this.$route.query.endTime)
+    const now = +new Date()
+    if (start > now || end < now) {
+      this.result = true
+      this.resultType = false
+      this.resultMsg = '链接不在有效时间内'
+      return
+    }
+    this.inviteCode = this.$route.query.s || ''
+    if (!this.inviteCode) {
+      this.result = true
+      this.resultType = false
+      this.resultMsg = '该链接缺失邀请码'
+    }
   },
   methods: {
     onSubmit () {
@@ -89,8 +112,11 @@ export default {
           attachType: 3
         }]
       }).then(res => {
-      }).catch().finally(() => {
-        this.loading = false
+        this.result = true
+        this.resultType = true
+        this.resultMsg = '认证成功！'
+      }).catch(res => {
+        this.$toast(res)
       })
     },
     // 获取自拍照的文件后缀
@@ -148,53 +174,24 @@ export default {
 </script>
 
 <style lang="less" scoped>
-  /*样式定义*/
-  .guide {
-    min-height: 100%;
-    background: url("../assets/images/guide-bg.png");
-    background-size: cover;
-    overflow: hidden;
-    >div {
-      .px2vw(width, 670);
-      .px2vw(padding, 40);
-      -webkit-box-sizing: border-box;
-      -moz-box-sizing: border-box;
-      box-sizing: border-box;
-      background: #fff;
-      .px2vw(border-radius, 16);
-      position: relative;
-      margin: auto;
-      color: #73767a;
-      font-size: 14px;
-      line-height: 1.8;
-    }
-    .notice {
-      .px2vw(margin-top, 220);
-      img {
-        .px2vw(width, 590);
-        .px2vw(margin-bottom, 30);
-      }
-    }
-    .notice2 {
-      .title {
-        font-size: 16px;
-        font-weight: bold;
-        color: black;
-      }
+  .invite {
+    .result {
+      text-align: center;
       i {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        line-height: 20px;
-        text-align: center;
-        color: #FFF;
-        font-size: 14px;
-        font-weight: bold;
-        background: linear-gradient(180deg, #fccd7a, #fba654);
-        border-radius: 100%;
+        font-size: 108px;
+        margin-top: 200px;
+        margin-bottom: 20px;
+        &.success {
+          color: #67C23A;
+        }
+        &.error {
+          color: #E6A23C;
+        }
       }
-      .px2vw(margin-top, 40);
-      .px2vw(margin-bottom, 80);
+      p {
+        font-size: 18px;
+        color: #909399;
+      }
     }
   }
 </style>
