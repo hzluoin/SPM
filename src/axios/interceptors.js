@@ -6,7 +6,7 @@ import Base64 from 'crypto-js/enc-base64'
 import md5 from 'js-md5'
 const axios = require('axios')
 axios.defaults.headers.post['Content-Type'] = 'application/json'
-axios.defaults.timeout = 10000
+axios.defaults.timeout = 20000
 
 // 添加请求拦截器
 axios.interceptors.request.use(function (config) {
